@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +27,6 @@ public interface EmployeeMapper {
 
     @Select("SELECT * FROM employee WHERE username = #{username}")
     Employee selectByUsername(String username);
+
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO); // 涉及到动态sql，用xml配置
 }
