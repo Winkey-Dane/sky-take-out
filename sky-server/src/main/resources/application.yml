@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: dev  # 指定默认使用的配置文件
   main:
     allow-circular-references: true
   datasource:

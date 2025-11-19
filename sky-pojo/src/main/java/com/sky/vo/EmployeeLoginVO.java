@@ -16,7 +16,7 @@ import java.io.Serializable;
 @ApiModel(description = "员工登录返回的数据格式")
 public class EmployeeLoginVO implements Serializable {
 
-    @ApiModelProperty("主键值")
+    @ApiModelProperty("主键值")  // 该注解的作用是为API文档生成提供字段描述信息，方便前端开发人员理解每个字段的含义。
     private Long id;
 
     @ApiModelProperty("用户名")
