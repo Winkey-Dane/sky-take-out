@@ -6,6 +6,7 @@ import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface EmployeeMapper {
@@ -29,4 +30,7 @@ public interface EmployeeMapper {
     Employee selectByUsername(String username);
 
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO); // 涉及到动态sql，用xml配置
+
+    // @Update("UPDATE employee SET status = #{status} WHERE id = #{id}")
+    void updateById(Employee employee);
 }
