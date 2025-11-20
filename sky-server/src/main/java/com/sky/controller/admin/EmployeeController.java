@@ -78,6 +78,7 @@ public class EmployeeController {
 
     /**
      * 新增员工
+     *
      * @param employeeDTO
      * @return
      */
@@ -92,6 +93,7 @@ public class EmployeeController {
 
     /**
      * 员工分页查询
+     *
      * @param employeePageQueryDTO
      * @return
      */
@@ -99,12 +101,13 @@ public class EmployeeController {
     @ApiOperation("员工分页查询接口")
     public Result<PageResult> getEmployees(EmployeePageQueryDTO employeePageQueryDTO) {
         log.info("员工分页查询：{}", employeePageQueryDTO);
-        PageResult pageResult= employeeService.getEmployees(employeePageQueryDTO);
+        PageResult pageResult = employeeService.getEmployees(employeePageQueryDTO);
         return Result.success(pageResult);
     }
 
     /**
      * 员工状态修改
+     *
      * @param status
      * @param id
      * @return
@@ -114,5 +117,36 @@ public class EmployeeController {
     public Result<String> changeStatus(@PathVariable Integer status, @RequestParam Long id) {
         log.info("修改员工状态：{}, {}", status, id);
         return employeeService.changeStatus(status, id);
+    }
+
+    /**
+     * 根据id查询员工信息、回显
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工信息接口、回显")
+    public Result<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
+        log.info("根据id查询员工信息：{}", id);
+        Employee employee = employeeService.getEmployeeById(id);
+        EmployeeDTO employeeDTO = new EmployeeDTO();
+        // 对象属性拷贝
+        org.springframework.beans.BeanUtils.copyProperties(employee, employeeDTO);
+        return Result.success(employeeDTO);
+    }
+
+    /**
+     * 修改员工信息
+     *
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改员工信息接口")
+    public Result<String> updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("修改员工信息：{}", employeeDTO);
+        employeeService.updateEmployee(employeeDTO);
+        return Result.success();
     }
 }
