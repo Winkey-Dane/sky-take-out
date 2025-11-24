@@ -5,6 +5,7 @@ import com.sky.dto.DishDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,13 @@ public class DishController {
         return dishService.pageQuery(categoryPageQueryDTO);
     }
 
+    /**
+     * 启用禁用菜品接口
+     *
+     * @param status 菜品状态 0-禁用 1-启用
+     * @param id     菜品id
+     * @return
+     */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用菜品接口")
     public Result updateStatus(@PathVariable Integer status, @RequestParam Long id) {
@@ -72,6 +80,28 @@ public class DishController {
         // 传过来是字符串，Spring会自动转换为List<Long>
         log.info("批量删除菜品：{}", ids);
         dishService.deleteDishByIds(ids);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询菜品信息
+     *
+     * @param id 菜品id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询菜品信息")
+    public Result<DishVO> getById(@PathVariable Long id) {
+        log.info("根据id查询菜品信息：{}", id);
+        DishVO dishVO = dishService.getByIdWithFlavor(id);
+        return Result.success(dishVO);
+    }
+
+    @PutMapping
+    @ApiOperation("修改菜品信息")
+    public Result updateDish(@RequestBody DishDTO dishDTO) {
+        log.info("修改菜品信息：{}", dishDTO);
+        dishService.updateDishWithFlavor(dishDTO);
         return Result.success();
     }
 }
