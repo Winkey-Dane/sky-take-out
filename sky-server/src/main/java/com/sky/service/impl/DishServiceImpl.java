@@ -1,0 +1,114 @@
+package com.sky.service.impl;
+
+import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
+import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.dto.DishDTO;
+import com.sky.entity.Dish;
+import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishFlavorMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
+import com.sky.result.PageResult;
+import com.sky.result.Result;
+import com.sky.service.DishService;
+import com.sky.vo.DishVO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@Slf4j
+public class DishServiceImpl implements DishService {
+    @Autowired
+    private DishMapper dishMapper;
+
+    @Autowired
+    private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
+
+    /**
+     * 保存菜品及其口味信息
+     * @param dishDTO
+     */
+    @Override
+    // 涉及到两个表的操作所以使用事务，确保数据一致性，出现异常时回滚，要么全部成功，要么全部失败
+   @Transactional(rollbackFor = Exception.class)
+    public void saveDishWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        // 保存菜品基本信息到菜品表dish
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.InsertDish(dish);
+        Long dishId = dish.getId(); // 获取菜品id
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if(flavors!=null||flavors.size()>0){
+            // 口味会有多个，插入n条数据 保存菜品口味信息到菜品口味表dish_flavor
+            // 可以批量插入
+            flavors.forEach(flavor->{
+                flavor.setDishId(dishId);
+            });
+            dishFlavorMapper.insertDishFlavorBatch(flavors,dishId);
+        }
+    }
+
+    @Override
+    public Result<PageResult> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
+        PageResult pageResult = new  PageResult();
+        PageHelper.startPage(
+                categoryPageQueryDTO.getPage(),
+                categoryPageQueryDTO.getPageSize());
+        Page<DishVO> page = dishMapper.pageQuery(categoryPageQueryDTO);
+        pageResult.setTotal(page.getTotal());
+        pageResult.setRecords(page.getResult());
+        return Result.success(pageResult);
+    }
+
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        Dish dish = new Dish();
+        dish.setId(id);
+        dish.setStatus(status);
+        dishMapper.updateById(dish);
+
+    }
+
+    /**
+     * 删除菜品及其口味信息
+     * @param ids
+     */
+    @Override
+    public void deleteDishByIds(List<Long> ids) {
+        // 在售状态的菜品不能删除
+        for (Long id : ids) {
+            Dish dish = dishMapper.selectById(id);
+            if(Objects.equals(dish.getStatus(), StatusConstant.ENABLE)){
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+        // 是否被套餐关联了
+        List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
+        if(setmealIds!=null&& !setmealIds.isEmpty()){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        // 删除菜品表中的数据
+        for(Long id : ids){
+            dishMapper.deleteById(id);
+            // 删除关联的菜品口味表中的数据
+            dishFlavorMapper.deleteByDishId(id);
+        }
+    }
+
+
+    }
