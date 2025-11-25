@@ -40,4 +40,6 @@ public interface DishMapper {
     * 根据ids批量删除菜品
      */
     void dleteByIds(List<Long> ids);
+
+    List<Dish> list(Dish dish);
 }
