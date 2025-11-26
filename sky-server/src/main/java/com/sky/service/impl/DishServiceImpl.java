@@ -146,6 +146,7 @@ public class DishServiceImpl implements DishService {
      * @param dishDTO
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDishWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         // 更新菜品表中的基本信息
@@ -156,7 +157,7 @@ public class DishServiceImpl implements DishService {
         // 先删除原有口味数据
         dishFlavorMapper.deleteByDishId(dishId);
         List<DishFlavor> flavors = dishDTO.getFlavors();
-        if (flavors != null || flavors.size() > 0) {
+        if (flavors != null && flavors.size() > 0) {
             // 再插入新的口味数据，口味可能有多个，插入n条数据
             for (DishFlavor flavor : flavors) {
                 flavor.setDishId(dishId);
