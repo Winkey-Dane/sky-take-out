@@ -190,4 +190,11 @@ public class DishServiceImpl implements DishService {
 
         return dishVOList;
     }
+
+    @Override
+    public List<Dish> listDishByCategoryId(Long categoryId) {
+
+        List<Dish> list = dishMapper.listDishByCategoryId(categoryId);
+        return list;
+    }
 }

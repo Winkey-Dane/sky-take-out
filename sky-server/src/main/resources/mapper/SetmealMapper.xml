@@ -2,13 +2,64 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealMapper">
 
-<!--    <select id="getSetmealIdsByDishIds" resultType="java.lang.Long">-->
-<!--        select distinct setmeal_id-->
-<!--        from setmeal_dish where dish_id in-->
-<!--        <foreach collection="DishIds" item="dishId" open="(" separator="," close=")">-->
-<!--            #{dishId}-->
-<!--        </foreach>-->
-<!--    </select>-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into setmeal (category_id, name, price, status, description, image, create_time, update_time, create_user, update_user)
+        values (#{categoryId}, #{name}, #{price}, #{status}, #{description}, #{image}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+<!--    批量插入套餐菜品关联数据-->
+<!--     传入参数: List<SetmealDish> setmealDishes-->
+<!--    作用: 将套餐与菜品的关联信息批量插入到setmeal_dish表中-->
+<!--     这种方式可以提高插入效率，减少数据库交互次数-->
+    <insert id="insertIntoSetMealDishes">
+        insert into setmeal_dish (setmeal_id, dish_id, name, price, copies)
+        values
+        <foreach collection="setmealDishes" item="setmealDish" separator=",">
+            (#{id}, #{setmealDish.dishId}, #{setmealDish.name}, #{setmealDish.price}, #{setmealDish.copies})
+        </foreach>
+    </insert>
+
+    <update id="updateById" useGeneratedKeys="true" keyProperty="id">
+        update setmeal
+            <set>
+                <if test="id != null">
+                    id = #{id}
+                </if>
+                <if test="categoryId != null">
+                    , category_id = #{categoryId}
+                </if>
+                <if test="name != null">
+                    , name = #{name}
+                </if>
+                <if test="price != null">
+                    , price = #{price}
+                </if>
+                <if test="status != null">
+                    , status = #{status}
+                </if>
+                <if test="description != null">
+                    , description = #{description}
+                </if>
+                <if test="image != null">
+                    , image = #{image}
+                </if>
+                <if test="updateTime != null">
+                    , update_time = #{updateTime}
+                </if>
+                <if test="updateUser != null">
+                    , update_user = #{updateUser}
+                </if>
+            </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSetmealByIds">
+        delete from setmeal
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 
     <select id="list" parameterType="Setmeal" resultType="Setmeal">
         select * from setmeal
@@ -23,5 +74,22 @@
                 and status = #{status}
             </if>
         </where>
+    </select>
+    <select id="pageQuerySetmeal" resultType="com.sky.vo.SetmealVO">
+        select s.id, s.name, s.category_id as categoryId, s.price, s.status, s.description, s.image, s.update_time as updateTime, c.name as categoryName
+        from setmeal s
+        left join category c on s.category_id = c.id
+        <where>
+            <if test="name != null and name != ''">
+                and s.name like concat('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                and s.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and s.status = #{status}
+            </if>
+        </where>
+        order by s.create_time desc
     </select>
 </mapper>

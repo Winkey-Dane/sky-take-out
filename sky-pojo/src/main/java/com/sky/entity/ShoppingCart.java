@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ShoppingCart implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; // 序列化版本号,用于确保类的兼容性,在反序列化时验证类的版本
 
     private Long id;
 

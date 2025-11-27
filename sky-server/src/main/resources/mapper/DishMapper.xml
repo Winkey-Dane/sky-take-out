@@ -40,6 +40,20 @@
         order by create_time desc
     </select>
 
+<!--    <select id="listDishByCategoryId" resultType="Dish" parameterType="Dish">-->
+<!--        select * from dish-->
+<!--        <where>-->
+<!--            <if test="categoryId != null">-->
+<!--                and category_id = #{categoryId}-->
+<!--            </if>-->
+<!--            <if test="status != null">-->
+<!--                and status = 1-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        order by create_time desc-->
+<!--    </select>-->
+
+
     <!--通用修改-->
     <update id="updateById">
         update dish

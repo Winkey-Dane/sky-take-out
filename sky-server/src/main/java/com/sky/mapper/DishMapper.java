@@ -42,4 +42,7 @@ public interface DishMapper {
     void dleteByIds(List<Long> ids);
 
     List<Dish> list(Dish dish);
+
+    @Select("select * from dish where category_id = #{categoryId} ")
+    List<Dish> listDishByCategoryId(Long categoryId);
 }
