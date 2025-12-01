@@ -1,6 +1,6 @@
 package com.sky.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.xiaoymin.knife4j.core.util.CollectionUtils;
@@ -32,9 +32,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import com.sky.websocket.WebSocketServer;
 
 @Service
 @Slf4j
@@ -56,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      *
@@ -166,6 +173,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // 订单支付成功，推送消息给商家端 type orderId content
+        Map map = new HashMap();
+        map.put("orderId", ordersDB.getId());
+        map.put("type",1); // 1表示新订单通知 2 表示客户催单
+        map.put("content","订单号：" + ordersDB.getNumber());
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
