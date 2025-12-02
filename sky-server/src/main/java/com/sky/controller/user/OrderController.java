@@ -15,6 +15,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.sky.websocket.WebSocketServer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController("userOrderController")
 @RequestMapping("user/order")
@@ -93,6 +97,19 @@ public class OrderController {
     @ApiOperation("再来一单")
     public Result Repetition(@PathVariable Long id) {
         orderService.repetition(id);
+        return Result.success();
+    }
+
+    /**
+     * 订单催单
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("订单催单")
+    public Result reminder(@PathVariable Integer id) {
+        log.info("订单催单：{}", id);
+        orderService.reminder(id);
         return Result.success();
     }
 }
