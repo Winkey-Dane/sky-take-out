@@ -5,4 +5,16 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (openid,create_time) VALUES (#{openid}, #{createTime})
     </insert>
+
+    <select id="getNewUserTotalByDate" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+        <where>
+            <if test="beginTime != null">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
 </mapper>

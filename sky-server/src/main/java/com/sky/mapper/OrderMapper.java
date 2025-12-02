@@ -6,8 +6,10 @@ import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -62,4 +64,39 @@ public interface OrderMapper {
      */
     @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndTimeLT(int status, LocalDateTime orderTime);
+
+    /**
+     * 根据动态条件获取当天营业额
+     * @param map
+     * @return
+     */
+    Double getTurnoverByDate(Map map);
+
+    /**
+     * 根据动态条件获取截止到今天的订单总数
+     * @param map
+     * @return
+     */
+    Integer getOrderCountByToday(Map map);
+
+    /**
+     * 根据动态条件获取截止到今天的完成订单总数
+     * @param map
+     * @return
+     */
+    Integer getOrderCompletedCountByToday(Map map);
+
+    /**
+     * 根据动态条件获取某天的订单总数
+     * @param map
+     * @return
+     */
+    Integer getOrderCountByDate(Map map);
+
+    /**
+     * 根据动态条件获取某天的完成订单总数
+     * @param map
+     * @return
+     */
+    Integer getOrderCompletedCountByDate(Map map);
 }

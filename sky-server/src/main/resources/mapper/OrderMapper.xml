@@ -68,5 +68,66 @@
         order by order_time desc
     </select>
 
+    <select id="getTurnoverByDate" resultType="java.lang.Double">
+        select sum(amount) from orders
+        <where>
+            <if test="beginTime != null">
+                and order_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{endTime}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOrderCountByToday" resultType="java.lang.Integer">
+        select count(*) from orders
+        where order_time &lt;= #{endTime}
+    </select>
+
+    <select id="getOrderCompletedCountByToday" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="endTime != null">
+                and order_time &lt;= #{endTime}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOrderCountByDate" resultType="java.lang.Integer">
+        select count(*) from orders
+        <where>
+            <if test="beginTime != null">
+                and order_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOrderCompletedCountByDate" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="beginTime != null">
+                and order_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{endTime}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+
 
 </mapper>
