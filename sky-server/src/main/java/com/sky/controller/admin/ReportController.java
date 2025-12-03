@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 
 
@@ -75,5 +76,15 @@ public class ReportController {
             @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
         log.info("获取销量前十统计报表，beginDate：{}，endDate：{}", beginDate, endDate);
         return Result.success(reportService.getSalesTop10Report(beginDate, endDate));
+    }
+
+    /**
+     * 导出报表
+     * @param response
+     */
+    @GetMapping("/export")
+    @ApiOperation("导出报表")
+    public void export(HttpServletResponse response){
+        reportService.exportBusinessData(response);
     }
 }
