@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +138,32 @@ public class ReportServiceImpl implements ReportService {
         Double orderCompletionRate = orderCompletedSoFar.doubleValue() / orderTotalSoFar.doubleValue();
         orderReportVO.setOrderCompletionRate(orderCompletionRate);
         return orderReportVO;
+    }
+
+    /**
+     * 获取销售排行榜前十报表
+     *
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getSalesTop10Report(LocalDate beginDate, LocalDate endDate) {
+        LocalDateTime beginTime = LocalDateTime.of(beginDate, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+        SalesTop10ReportVO salesTop10ReportVO = new SalesTop10ReportVO();
+        List<String> nameList = new ArrayList<>();
+        List<String> numberList = new ArrayList<>();
+        for (GoodsSalesDTO goodsSalesDTO : salesTop10) {
+            nameList.add(goodsSalesDTO.getName());
+            numberList.add(String.valueOf(goodsSalesDTO.getNumber()));
+        }
+        String nameL = StringUtils.join(nameList, ",");
+        String numberL = StringUtils.join(numberList, ",");
+        salesTop10ReportVO.setNameList(nameL);
+        salesTop10ReportVO.setNumberList(numberL);
+        return salesTop10ReportVO;
     }
 
     private List<LocalDate> everyDay(LocalDate beginDate, LocalDate endDate) {
